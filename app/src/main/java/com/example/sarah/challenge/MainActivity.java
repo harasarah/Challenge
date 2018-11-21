@@ -35,13 +35,10 @@ public class MainActivity extends AppCompatActivity {
     }
     private void validate(String username, String userPassword)
     {
-        if((username.equals("Admin")) && (userPassword.equals("Admin")))
+        if((username.equals("User")) && (userPassword.equals("1234")))
         {
-            Toast toast;
-            Context context = getApplicationContext();
-            String message = "You're connected";
-            toast = Toast.makeText(context,message,Toast.LENGTH_SHORT);
-            toast.show();
+            Intent intent = new Intent(MainActivity.this, SecondActivity.class);
+            startActivity(intent);
         }else{
             counter--;
             if(counter == 0)
