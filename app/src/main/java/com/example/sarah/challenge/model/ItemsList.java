@@ -1,5 +1,6 @@
-package com.example.sarah.challenge;
+package com.example.sarah.challenge.model;
 
+import com.example.sarah.challenge.model.Items;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;

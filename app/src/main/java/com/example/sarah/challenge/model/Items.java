@@ -1,4 +1,4 @@
-package com.example.sarah.challenge;
+package com.example.sarah.challenge.model;
 
 import com.google.gson.annotations.SerializedName;
 
