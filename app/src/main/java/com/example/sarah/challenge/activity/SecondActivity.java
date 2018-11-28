@@ -2,65 +2,71 @@ package com.example.sarah.challenge.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.sarah.challenge.R;
+import com.example.sarah.challenge.adapter.ItemsAdapter;
+import com.example.sarah.challenge.model.Items;
+import com.example.sarah.challenge.model.ItemsList;
+import com.example.sarah.challenge.network.GetItemsDataService;
+import com.example.sarah.challenge.network.RetrofitInstance;
+
+import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class SecondActivity extends AppCompatActivity {
-    String[] REPO = {"Repo1", "Repo2", "Repo3","Repo4","Repo5"};
-    String[] DESCRIPTION = {"Description of Repo1", "Description of Repo2", "Description of Repo3", "Description of Repo4", "Description of Repo5"};
-    String[] STARS = {"50", "50","50", "50", "50"};
-    String[] USERNAME = {"Username1", "Username2","Username3", "Username4", "Username5"};
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView( R.layout.activity_second);
-
-        ListView listView = findViewById(R.id.listView);
-
-        CustomAdapter customAdapter = new CustomAdapter();
-        listView.setAdapter(customAdapter);
-
-    }
-
-    class CustomAdapter extends BaseAdapter{
+        private ItemsAdapter adapter;
+        private RecyclerView recyclerView;
 
         @Override
-        public int getCount() {
-            return REPO.length;
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_second);
+
+            /*Create handle for the RetrofitInstance interface*/
+            GetItemsDataService service = RetrofitInstance.getRetrofitInstance().create(GetItemsDataService.class);
+
+            /*Call the method with parameter in the interface to get the repo data*/
+            Call<ItemsList> call = service.getItemsData("search","stars","desc");
+
+            /*Log the URL called*/
+            Log.wtf("URL Called", call.request().url() + "");
+
+            call.enqueue(new Callback<ItemsList>() {
+                @Override
+                public void onResponse(Call<ItemsList> call, Response<ItemsList> response) {
+                    generateItemsList(response.body().getItemsArrayList());
+                }
+
+                @Override
+                public void onFailure(Call<ItemsList> call, Throwable t) {
+                    Toast.makeText(SecondActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
 
-        @Override
-        public Object getItem(int position) {
-            return null;
-        }
+        /*Method to generate List of repos using RecyclerView with custom adapter*/
+        private void generateItemsList(ArrayList<Items> ItmDataList) {
+            recyclerView = (RecyclerView) findViewById(R.id.listView);
 
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
+            adapter = new ItemsAdapter(ItmDataList);
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            convertView = getLayoutInflater().inflate( R.layout.custom_layout,null );
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(SecondActivity.this);
 
-            TextView textView_repo_name= (TextView)convertView.findViewById(R.id.textView_repo_name);
-            TextView textView_description = (TextView)convertView.findViewById(R.id.textView_description);
-            TextView textView_stars = (TextView)convertView.findViewById(R.id.textView_stars);
-            TextView textView_username = (TextView)convertView.findViewById(R.id.textView_username);
+            recyclerView.setLayoutManager(layoutManager);
 
-            textView_repo_name.setText(REPO[position]);
-            textView_description.setText(DESCRIPTION[position]);
-            textView_stars.setText(STARS[position]);
-            textView_username.setText(USERNAME[position]);
-
-            return convertView;
+            recyclerView.setAdapter(adapter);
         }
     }
-}

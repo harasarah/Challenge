@@ -7,6 +7,8 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 public interface GetItemsDataService {
-    @GET("https://api.github.com/search/repositories?q=created:%3E2017-10-22&sort=stars&order=desc")
-    Call<ItemsList> getItemsData(@Query("page") int page );
+    @GET("repositories")
+    Call<ItemsList> getItemsData(@Query("q") String q ,@Query("sort") String sort ,@Query("order") String order);
 }
+
+
